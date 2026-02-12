@@ -1,0 +1,24 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          cd app
+          docker build -t devops-e2e:ci .
+
+      - name: Run Horusec SAST
+        run: |
+          docker run --rm -v "$PWD:/src" horuszup/horusec-cli:latest \
+          horusec start -p /src -e=true || true
